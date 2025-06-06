@@ -6,14 +6,14 @@ print('Map centered on São Paulo State, Brazil.');
 var startDate = '2023-01-01';
 var endDate = '2023-12-31';
 
-var maxCloudCover = 5; // 5% cloud cover
+var maxCloudCover = 5;
 
 var sentinel2 = ee.ImageCollection('COPERNICUS/S2_SR')
   .filterDate(startDate, endDate)
   .filterBounds(saoPaulo_bbox)
   .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', maxCloudCover);
 
-var selectedBands = ['B4', 'B3', 'B2']; // Red, Green, Blue bands for natural color
+var selectedBands = ['B4', 'B3', 'B2'];
 var homogeneousCollection = sentinel2.select(selectedBands);
 
 var compositeImage = homogeneousCollection.median();
@@ -34,8 +34,8 @@ if (!hasBands) {
 
   var exportDescription = 'SaoPaulo_State_Satellite_Image_RGB';
   var exportFileNamePrefix = 'SaoPaulo_State_RGB';
-  var exportFolder = 'GEE_Exports_SaoPaulo_State'; // Folder name in your Google Drive
-  var exportScale = 10; // Resolution in meters per pixel (10m is Sentinel-2 native)
+  var exportFolder = 'GEE_Exports_SaoPaulo_State';
+  var exportScale = 10;
   var exportMaxPixels = 1e13; 
                             
   Export.image.toDrive({
@@ -43,7 +43,7 @@ if (!hasBands) {
     description: exportDescription,
     folder: exportFolder,
     fileNamePrefix: exportFileNamePrefix,
-    region: saoPaulo_bbox, // Pass the ee.Geometry.Rectangle object directly
+    region: saoPaulo_bbox,
     scale: exportScale,
     maxPixels: exportMaxPixels
   });
