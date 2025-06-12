@@ -8,13 +8,13 @@ var saoPaulo_city_bbox = ee.Geometry.Rectangle([-46.85, -24.00, -46.35, -23.35])
 Map.centerObject(saoPaulo_city_bbox, 10);
 print('Map centered on São Paulo City, Brazil.');
 
-var startDate = '2023-01-01';
-var endDate = '2023-12-31';
+var startDate = '2025-01-01';
+var endDate = '2025-06-01';
 
 var maxCloudCover = 5;
 
 // Filter the Sentinel-2 image collection for the defined city bounding box.
-var sentinel2 = ee.ImageCollection('COPERNICUS/S2_SR')
+var sentinel2 = ee.ImageCollection('COPERNICUS/S2_SR_HARMONIZED')
   .filterDate(startDate, endDate)
   .filterBounds(saoPaulo_city_bbox) // Filter by the city's bounding box
   .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', maxCloudCover);
@@ -41,8 +41,8 @@ if (!hasBands) {
 
   // Update export details to reflect São Paulo City
   var exportDescription = 'SaoPaulo_City_Satellite_Image_RGB';
-  var exportFileNamePrefix = 'SaoPaulo_City_RGB';
-  var exportFolder = 'GEE_Exports_SaoPaulo_City'; // New folder for city exports
+  var exportFileNamePrefix = 'SaoPaulo_';
+  var exportFolder = 'SaoPaulo'; // New folder for city exports
   var exportScale = 10; // 10 meters per pixel for Sentinel-2
   var exportMaxPixels = 1e13; // Max pixels to allow large exports
 
