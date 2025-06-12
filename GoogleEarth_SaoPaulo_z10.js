@@ -1,16 +1,22 @@
-var saoPaulo_bbox = ee.Geometry.Rectangle([-53.0, -26.0, -44.0, -19.5]);
+// Define the bounding box for the city of São Paulo, Brazil.
+// These coordinates are approximate for the urban area of São Paulo city.
+// [west, south, east, north]
+var saoPaulo_city_bbox = ee.Geometry.Rectangle([-46.85, -24.00, -46.35, -23.35]);
 
-Map.centerObject(saoPaulo_bbox, 7);
-print('Map centered on São Paulo State, Brazil.');
+// Center the map on the city of São Paulo with a suitable zoom level.
+// A zoom level of 10-12 is usually good for city views.
+Map.centerObject(saoPaulo_city_bbox, 10);
+print('Map centered on São Paulo City, Brazil.');
 
 var startDate = '2023-01-01';
 var endDate = '2023-12-31';
 
 var maxCloudCover = 5;
 
+// Filter the Sentinel-2 image collection for the defined city bounding box.
 var sentinel2 = ee.ImageCollection('COPERNICUS/S2_SR')
   .filterDate(startDate, endDate)
-  .filterBounds(saoPaulo_bbox)
+  .filterBounds(saoPaulo_city_bbox) // Filter by the city's bounding box
   .filterMetadata('CLOUDY_PIXEL_PERCENTAGE', 'less_than', maxCloudCover);
 
 var selectedBands = ['B4', 'B3', 'B2'];
@@ -18,34 +24,38 @@ var homogeneousCollection = sentinel2.select(selectedBands);
 
 var compositeImage = homogeneousCollection.median();
 
+// Check if the composite image has any bands before proceeding.
 var hasBands = compositeImage.bandNames().size().getInfo() > 0;
 
 if (!hasBands) {
-  print('Erro n achou bands');
+  print('Error: No bands found in the composite image. This might be due to no images matching the criteria (date, cloud cover, or region).');
 } else {
   var visualizationParams = {
-    min: 0,      
-    max: 2500,  
-    gamma: 1.1  
+    min: 0,
+    max: 2500,
+    gamma: 1.1
   };
 
-  Map.addLayer(compositeImage, visualizationParams, 'São Paulo State - Sentinel-2 RGB');
+  Map.addLayer(compositeImage, visualizationParams, 'São Paulo City - Sentinel-2 RGB');
   print('Image displayed on the map.');
 
-  var exportDescription = 'SaoPaulo_State_Satellite_Image_RGB';
-  var exportFileNamePrefix = 'SaoPaulo_State_RGB';
-  var exportFolder = 'GEE_Exports_SaoPaulo_State';
-  var exportScale = 10;
-  var exportMaxPixels = 1e13; 
-                            
+  // Update export details to reflect São Paulo City
+  var exportDescription = 'SaoPaulo_City_Satellite_Image_RGB';
+  var exportFileNamePrefix = 'SaoPaulo_City_RGB';
+  var exportFolder = 'GEE_Exports_SaoPaulo_City'; // New folder for city exports
+  var exportScale = 10; // 10 meters per pixel for Sentinel-2
+  var exportMaxPixels = 1e13; // Max pixels to allow large exports
+
   Export.image.toDrive({
     image: compositeImage,
     description: exportDescription,
     folder: exportFolder,
     fileNamePrefix: exportFileNamePrefix,
-    region: saoPaulo_bbox,
+    region: saoPaulo_city_bbox, // Use the city's bounding box for export
     scale: exportScale,
     maxPixels: exportMaxPixels
   });
 
+  print('Export task initiated for São Paulo City image to Google Drive.');
+  print('Check the "Tasks" tab in Earth Engine Code Editor to monitor export progress.');
 }
